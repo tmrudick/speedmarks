@@ -49,7 +49,7 @@ application = webapp.WSGIApplication(
                                      (r'/(.*)/create', CreateLink),
                                      (r'/(.*)/(.*)', RedirectToLink),
                                      (r'/(.*)', Links)],
-                                     debug=True)
+                                     debug=False)
 
 def main():
     run_wsgi_app(application)
