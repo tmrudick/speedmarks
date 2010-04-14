@@ -1,36 +1,58 @@
-#!/usr/bin/env python
-#
-# Copyright 2007 Google Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-
-
 from google.appengine.ext import webapp
-from google.appengine.ext.webapp import util
+from google.appengine.ext.webapp.util import run_wsgi_app
+from google.appengine.ext import db
+import os
+from google.appengine.ext.webapp import template
 
+class Link(db.Model):
+  url = db.StringProperty()
+  title = db.StringProperty()
+  bookmarklet = db.StringProperty()
+  created_time = db.DateTimeProperty(auto_now_add=True)
+    
 
-class MainHandler(webapp.RequestHandler):
+class Root(webapp.RequestHandler):
+    def get(self):
+        path = os.path.join(os.path.dirname(__file__), 'views/index.html')
+        self.response.out.write(template.render(path, {}))
 
-  def get(self):
-    self.response.out.write('Hello world!')
+class Links(webapp.RequestHandler):
+    def get(self, bookmarklet):
+      links = db.GqlQuery("SELECT * FROM Link WHERE bookmarklet = '" + bookmarklet + "'").fetch(100)
+      
+      path = os.path.join(os.path.dirname(__file__), 'views/list.html')
+      self.response.out.write(template.render(path, {'links': links}))      
+      
+class CreateLink(webapp.RequestHandler):
+    def get(self, bookmarklet):
+      link = Link()
+      link.url = self.request.get('url')
+      link.title = self.request.get('title')
+      link.bookmarklet = bookmarklet
+      
+      link.put()
+      
+      self.redirect(link.url)
+      
+class RedirectToLink(webapp.RequestHandler):
+  def get(self, bookmarklet, link_key):
+    link = db.get(link_key)
+    
+    if link.bookmarklet == bookmarklet:
+      link.delete()
+      self.redirect(link.url)
+    else:
+      self.redirect('/')
 
+application = webapp.WSGIApplication(
+                                     [('/', Root),
+                                     (r'/(.*)/create', CreateLink),
+                                     (r'/(.*)/(.*)', RedirectToLink),
+                                     (r'/(.*)', Links)],
+                                     debug=True)
 
 def main():
-  application = webapp.WSGIApplication([('/', MainHandler)],
-                                       debug=True)
-  util.run_wsgi_app(application)
+    run_wsgi_app(application)
 
-
-if __name__ == '__main__':
-  main()
+if __name__ == "__main__":
+    main()
