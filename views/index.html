@@ -4,7 +4,7 @@
 <html lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<title>OneTimeBookmarks</title>
+	<title>Speedmarks</title>
 </head>
 <body>
   <script type="text/javascript">
@@ -18,12 +18,12 @@
   var guid = guid();
 
   var save_bookmarklet = document.createElement('a');
-  save_bookmarklet.href="javascript:location.href='http://speedlinks.appspot.com/" + guid + "/create?url='+encodeURIComponent(location.href)+';title='+encodeURIComponent(document.title.replace(/^\s*|\s*$/g,''))";
+  save_bookmarklet.href="javascript:location.href='http://speedmarks.appspot.com/" + guid + "/create?url='+encodeURIComponent(location.href)+';title='+encodeURIComponent(document.title.replace(/^\s*|\s*$/g,''))";
   save_bookmarklet.innerHTML = "Bookmark";
   document.body.appendChild(save_bookmarklet);
   
   show_bookmarklet = document.createElement('a');
-  show_bookmarklet.href="javascript:location.href='http:/speedlinks.appspot.com/" + guid + "'";
+  show_bookmarklet.href="javascript:location.href='http://speedmarks.appspot.com/" + guid + "'";
   show_bookmarklet.innerHTML = "Bookmarks";
   document.body.appendChild(show_bookmarklet);
 
