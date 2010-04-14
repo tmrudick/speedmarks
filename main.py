@@ -18,7 +18,7 @@ class Root(webapp.RequestHandler):
 
 class Links(webapp.RequestHandler):
     def get(self, bookmarklet):
-      links = db.GqlQuery("SELECT * FROM Link WHERE bookmarklet = '" + bookmarklet + "'").fetch(100)
+      links = db.GqlQuery("SELECT * FROM Link WHERE bookmarklet = '" + bookmarklet + "' ORDER BY created_time DESC").fetch(100)
       
       path = os.path.join(os.path.dirname(__file__), 'views/list.html')
       self.response.out.write(template.render(path, {'links': links}))      

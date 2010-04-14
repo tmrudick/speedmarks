@@ -5,11 +5,38 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<title>Speedmarks</title>
+	<style type="text/css">
+	  * {
+	    margin: 0;
+	    padding: 0;
+	  }
+	  body {
+	    font-family: Helvetica, Arial, Sans-serif;
+	  }
+	  p#empty {
+	    font-size: 50pt;
+	    margin: 50px;
+	  }
+	  p#instructions {
+	    margin-left: 50px;
+	  }
+	  ul {
+	    margin: 25px;
+	  }
+	  a, a.visited {
+	    color: blue;
+	  }
+	  h1 {
+	    margin: 25px;
+	  }
+	</style>
 </head>
 <body>
   {% if not links %}
-    Nothing here
+    <p id="empty">Nothing here...</p>
+    <p id="instructions">Add some speedmarks and then check back.</p>
   {% else %}
+  <h1>Your Speedmarks</h1>
   <ul>
     {% for link in links %}
       <li><a href="/{{ link.bookmarklet }}/{{ link.key }}">
