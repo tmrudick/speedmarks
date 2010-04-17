@@ -12,6 +12,10 @@
 	  }
 	  body {
 	    font-family: Helvetica, Arial, Sans-serif;
+	    height: 100%;
+	  }
+	  html {
+	    height: 100%;
 	  }
 	  p#empty {
 	    font-size: 50pt;
@@ -21,31 +25,69 @@
 	    margin-left: 50px;
 	  }
 	  ul {
-	    margin: 25px;
+	    list-style: none;
+	    margin-left: 25px;
+	    border-right: 1px solid #ddd;
+	    width: 350px;
+	    height: 100%;
+	  }
+	  ul li:first-child {
+	    padding-top: 10px;
+	  }
+	  ul li:first-child .date {
+	    top: 10px;
 	  }
 	  a, a.visited {
-	    color: blue;
+	    color: #000;
 	  }
 	  h1 {
-	    margin: 25px;
+	    font-size: 100%;
+      position: absolute;
+      right: 5px;
+      top: 5px;
+	  }
+	  li {
+	    height: 50px;
+	    position: relative;
+	  }
+	  .date {
+	    font-size: 130%;
+	    position: absolute;
+	    display: block;
+      top: 0px;
+      right: -130px;
+      color: #aaa;
+	  }
+	  .url {
+	    display: block;
+	    font-size: 70%;
+	    color: #777;
 	  }
 	</style>
 </head>
 <body>
+  <h1><a href="http://speedmarks.appspot.com">Speedmarks</a></h1>
   {% if not links %}
     <p id="empty">Nothing here...</p>
     <p id="instructions">Add some speedmarks and then check back.</p>
   {% else %}
-  <h1>Your Speedmarks</h1>
   <ul>
     {% for link in links %}
-      <li><a href="/{{ link.bookmarklet }}/{{ link.key }}">
+      <li>
+        <a href="/{{ link.bookmarklet }}/{{ link.key }}">
         {% if link.title %}
           {{ link.title }}
         {% else %}
           {{ link.url }}
         {% endif %}
-        </a></li>
+        </a>
+        {% if link.title %}
+          <span class="url">{{ link.url }}</span>
+        {% endif %}
+        {% ifchanged link.created_time.date %}
+          <span class="date">{{ link.created_time.date|date:"M j, Y" }}</span>        
+        {% endifchanged %}
+        </li>
     {% endfor %}
   </ul>
   {% endif %}

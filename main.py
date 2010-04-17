@@ -9,7 +9,6 @@ class Link(db.Model):
   title = db.StringProperty()
   bookmarklet = db.StringProperty()
   created_time = db.DateTimeProperty(auto_now_add=True)
-    
 
 class Root(webapp.RequestHandler):
     def get(self):
