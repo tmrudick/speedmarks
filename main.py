@@ -27,6 +27,10 @@ class CreateLink(webapp.RequestHandler):
       link = Link()
       link.url = self.request.get('url')
       link.title = self.request.get('title')
+      
+      if len(link.title) > 35:
+        link.title = link.title[0:35] + '...'
+      
       link.bookmarklet = bookmarklet
       
       link.put()
