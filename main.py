@@ -19,6 +19,12 @@ class Links(webapp.RequestHandler):
     def get(self, bookmarklet):
       links = db.GqlQuery("SELECT * FROM Link WHERE bookmarklet = '" + bookmarklet + "' ORDER BY created_time DESC").fetch(100)
       
+      for link in links:
+        if len(link.title) > 35:
+          link.title = link.title[0:35] + '...'
+        if len(link.url) > 35:
+          link.url = link.url[0:35] + '...'
+      
       path = os.path.join(os.path.dirname(__file__), 'views/list.html')
       self.response.out.write(template.render(path, {'links': links}))      
       
