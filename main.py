@@ -20,10 +20,10 @@ class Links(webapp.RequestHandler):
       links = db.GqlQuery("SELECT * FROM Link WHERE bookmarklet = '" + bookmarklet + "' ORDER BY created_time DESC").fetch(100)
       
       for link in links:
-        if len(link.title) > 55:
-          link.title = link.title[0:55] + '...'
-        if len(link.url) > 55:
-          link.url = link.url[0:55] + '...'
+        if len(link.title) > 80:
+          link.title = link.title[0:80] + '...'
+        if len(link.url) > 80:
+          link.url = link.url[0:80] + '...'
       
       path = os.path.join(os.path.dirname(__file__), 'views/list.html')
       self.response.out.write(template.render(path, {'links': links}))      
