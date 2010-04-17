@@ -76,13 +76,27 @@
       <li>
         <a href="/{{ link.bookmarklet }}/{{ link.key }}">
         {% if link.title %}
-          {{ link.title }}
+          {% if link.title|length > 35 %}
+            {{ link.title|slice:"35" }}...
+          {% else %}
+            {{ link.title }}
+          {% endif %}
         {% else %}
-          {{ link.url }}
+          {% if link.url|length > 35 %}
+            {{ link.url|slice:"35"}}...
+          {% else %}
+            {{ link.url }}
+          {% endif %}
         {% endif %}
         </a>
         {% if link.title %}
-          <span class="url">{{ link.url }}</span>
+          <span class="url">
+            {% if link.url|length > 35 %}
+              {{ link.url|slice:"35" }}...
+            {% else %}
+              {{ link.url }}
+            {% endif %}
+          </span>
         {% endif %}
         {% ifchanged link.created_time.date %}
           <span class="date">{{ link.created_time.date|date:"M j, Y" }}</span>        

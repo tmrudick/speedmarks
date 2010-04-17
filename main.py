@@ -27,10 +27,6 @@ class CreateLink(webapp.RequestHandler):
       link = Link()
       link.url = self.request.get('url')
       link.title = self.request.get('title')
-      
-      if len(link.title) > 35:
-        link.title = link.title[0:35] + '...'
-      
       link.bookmarklet = bookmarklet
       
       link.put()
@@ -52,7 +48,7 @@ application = webapp.WSGIApplication(
                                      (r'/(.*)/create', CreateLink),
                                      (r'/(.*)/(.*)', RedirectToLink),
                                      (r'/(.*)', Links)],
-                                     debug=False)
+                                     debug=True)
 
 def main():
     run_wsgi_app(application)
