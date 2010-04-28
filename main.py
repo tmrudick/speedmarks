@@ -3,6 +3,7 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext import db
 import os
 from google.appengine.ext.webapp import template
+from google.appengine.ext.db import BadKeyError
 
 class Link(db.Model):
   url = db.StringProperty()
@@ -41,9 +42,17 @@ class CreateLink(webapp.RequestHandler):
       
 class RedirectToLink(webapp.RequestHandler):
   def get(self, bookmarklet, link_key):
-    link = db.get(link_key)
-    
-    if link.bookmarklet == bookmarklet:
+    try:
+      link = db.get(link_key)
+    except BadKeyError:
+      path = os.path.join(os.path.dirname(__file__), 'views/error.html')
+      self.response.out.write(template.render(path, {}))
+      return
+      
+    if link == None:
+      path = os.path.join(os.path.dirname(__file__), 'views/error.html')
+      self.response.out.write(template.render(path, {}))
+    elif link.bookmarklet == bookmarklet:
       link.delete()
       self.redirect(link.url)
     else:
@@ -54,7 +63,7 @@ application = webapp.WSGIApplication(
                                      (r'/(.*)/create', CreateLink),
                                      (r'/(.*)/(.*)', RedirectToLink),
                                      (r'/(.*)', Links)],
-                                     debug=True)
+                                     debug=False)
 
 def main():
     run_wsgi_app(application)
