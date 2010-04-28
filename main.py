@@ -31,6 +31,11 @@ class Links(webapp.RequestHandler):
       
 class CreateLink(webapp.RequestHandler):
     def get(self, bookmarklet):
+      if self.request.get('url') == "":
+        path = os.path.join(os.path.dirname(__file__), 'views/error.html')
+        self.response.out.write(template.render(path, {}))
+        return
+      
       link = Link()
       link.url = self.request.get('url')
       link.title = self.request.get('title')

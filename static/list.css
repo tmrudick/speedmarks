@@ -1,0 +1,57 @@
+  * {
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    font-family: Helvetica, Arial, Sans-serif;
+    height: 100%;
+  }
+  html {
+    height: 100%;
+  }
+  p#empty {
+    font-size: 50pt;
+    margin: 50px;
+  }
+  p#instructions {
+    margin-left: 50px;
+  }
+  ul {
+    list-style: none;
+    margin-left: 175px;
+    border-left: 1px solid #ddd;
+    height: 100%;
+    padding-left: 15px;
+  }
+  ul li:first-child {
+    padding-top: 10px;
+  }
+  ul li:first-child .date {
+    top: 10px;
+  }
+  a, a.visited {
+    color: #000;
+  }
+  h1 {
+    font-size: 100%;
+    position: absolute;
+    right: 5px;
+    top: 5px;
+  }
+  li {
+    height: 50px;
+    position: relative;
+  }
+  .date {
+    font-size: 130%;
+    position: absolute;
+    display: block;
+    top: 0px;
+    left: -145px;
+    color: #aaa;
+  }
+  .url {
+    display: block;
+    font-size: 70%;
+    color: #777;
+  }
