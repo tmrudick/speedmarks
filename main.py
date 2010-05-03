@@ -11,6 +11,17 @@ class Link(db.Model):
   bookmarklet = db.StringProperty()
   created_time = db.DateTimeProperty(auto_now_add=True)
 
+class DailyStatistic(db.Model):
+  current_links = db.IntegerProperty()
+  links_served = db.IntegerProperty()
+  user_count = db.IntegerProperty()
+  date = db.DateProperty(auto_now_add=True)
+
+class SiteStatistics(db.Model):
+  current_links = db.IntegerProperty()
+  links_served = db.IntegerProperty()
+  user_count = db.IntegerProperty()
+
 class Root(webapp.RequestHandler):
     def get(self):
         path = os.path.join(os.path.dirname(__file__), 'views/index.html')
@@ -43,6 +54,8 @@ class CreateLink(webapp.RequestHandler):
       
       link.put()
       
+      
+      
       self.redirect(link.url)
       
 class RedirectToLink(webapp.RequestHandler):
@@ -62,6 +75,10 @@ class RedirectToLink(webapp.RequestHandler):
       self.redirect(link.url)
     else:
       self.redirect('/')
+
+class CreateStat(webapp.RequestHandler):
+  def get(self):
+    
 
 application = webapp.WSGIApplication(
                                      [('/', Root),
