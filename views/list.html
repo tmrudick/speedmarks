@@ -6,6 +6,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<title>Speedmarks</title>
 	<link rel="stylesheet" type="text/css" href="/static/list.css" />
+  <script type="text/javascript" src="/static/jquery.js"></script>
 </head>
 <body>
   <h1><a href="http://speedmarks.appspot.com">Speedmarks</a></h1>
@@ -17,11 +18,11 @@
     {% for link in links %}
       <li>
         <span class="save">
-          <a href="/{{ link.bookmarklet }}/{{ link.key }}/save">
+          <a href="/{{ link.bookmarklet }}/{{ link.key }}/save" onclick="$.get('/{{ link.bookmarklet }}/{{ link.key }}/save');change=false;return false;">
             {% if link.save_for_later %}
-              <img src="/static/star.png" onmouseover="o(this, 'gstar')" onmouseout="o(this, 'star')" />
+              <img src="/static/star.png" onmouseover="o(this)" onmouseout="o(this)" />
             {% else %}
-              <img src="/static/gray_star.png" onmouseover="o(this, 'star')" onmouseout="o(this, 'gstar')" />
+              <img src="/static/gray_star.png" onmouseover="o(this)" onmouseout="o(this)" />
             {% endif %}
           </a>
         </span>
@@ -50,12 +51,21 @@
     var gstar = new Image();
     gstar.src = '/static/gray_star.png';
     
-    function o(item, img) {
-      if (img == 'gstar') {
+    var change = true
+    
+    function o(item) {
+      if (!change)
+        return change=true
+      if (item.src == star.src) {
         item.src = gstar.src;
       } else {
         item.src = star.src;
       }
+    }
+    
+    function s(url) {
+      $.get(url);
+      
     }
   </script>
 </body>
