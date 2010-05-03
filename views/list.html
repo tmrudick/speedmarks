@@ -16,6 +16,15 @@
   <ul>
     {% for link in links %}
       <li>
+        <span class="save">
+          <a href="/{{ link.bookmarklet }}/{{ link.key }}/save">
+            {% if link.save_for_later %}
+              <img src="/static/star.png" onmouseover="o(this, 'gstar')" onmouseout="o(this, 'star')" />
+            {% else %}
+              <img src="/static/gray_star.png" onmouseover="o(this, 'star')" onmouseout="o(this, 'gstar')" />
+            {% endif %}
+          </a>
+        </span>
         <a href="/{{ link.bookmarklet }}/{{ link.key }}">
         {% if link.title %}
             {{ link.title }}
@@ -28,15 +37,6 @@
               {{ link.url }}
           </span>
         {% endif %}
-        <span class="save">
-          <a href="/{{ link.bookmarklet }}/{{ link.key }}/save">
-            {% if link.save_for_later %}
-              Un-save
-            {% else %}
-              Save
-            {% endif %}
-          </a>
-        </span>
         {% ifchanged link.created_time.date %}
           <span class="date">{{ link.created_time.date|date:"M j, Y" }}</span>        
         {% endifchanged %}
@@ -44,5 +44,19 @@
     {% endfor %}
   </ul>
   {% endif %}
+  <script type="text/javascript">
+    var star = new Image();
+    star.src = '/static/star.png';
+    var gstar = new Image();
+    gstar.src = '/static/gray_star.png';
+    
+    function o(item, img) {
+      if (img == 'gstar') {
+        item.src = gstar.src;
+      } else {
+        item.src = star.src;
+      }
+    }
+  </script>
 </body>
 </html>

@@ -72,6 +72,10 @@ class RedirectToLink(webapp.RequestHandler):
     elif link.bookmarklet == bookmarklet:
       if not link.save_for_later:
         link.delete() 
+      else:
+        link.save_for_later = False
+        link.save()
+        
       self.redirect(link.url)
     else:
       self.redirect('/')
