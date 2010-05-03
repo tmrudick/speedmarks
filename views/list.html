@@ -28,6 +28,15 @@
               {{ link.url }}
           </span>
         {% endif %}
+        <span class="save">
+          <a href="/{{ link.bookmarklet }}/{{ link.key }}/save">
+            {% if link.save_for_later %}
+              Un-save
+            {% else %}
+              Save
+            {% endif %}
+          </a>
+        </span>
         {% ifchanged link.created_time.date %}
           <span class="date">{{ link.created_time.date|date:"M j, Y" }}</span>        
         {% endifchanged %}

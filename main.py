@@ -10,6 +10,7 @@ class Link(db.Model):
   title = db.StringProperty()
   bookmarklet = db.StringProperty()
   created_time = db.DateTimeProperty(auto_now_add=True)
+  save_for_later = db.BooleanProperty();
 
 class DailyStatistic(db.Model):
   current_links = db.IntegerProperty()
@@ -54,8 +55,6 @@ class CreateLink(webapp.RequestHandler):
       
       link.put()
       
-      
-      
       self.redirect(link.url)
       
 class RedirectToLink(webapp.RequestHandler):
@@ -71,21 +70,33 @@ class RedirectToLink(webapp.RequestHandler):
       path = os.path.join(os.path.dirname(__file__), 'views/error.html')
       self.response.out.write(template.render(path, {}))
     elif link.bookmarklet == bookmarklet:
-      link.delete()
+      if not link.save_for_later:
+        link.delete() 
       self.redirect(link.url)
     else:
       self.redirect('/')
 
-class CreateStat(webapp.RequestHandler):
-  def get(self):
+class SaveLink(webapp.RequestHandler):
+  def get(self, bookmarklet, link_key):
+    try:
+      link = db.get(link_key)
+    except BadKeyError:
+       path = os.path.join(os.path.dirname(__file__), 'views/error.html')
+       self.response.out.write(template.render(path, {}))
+       return
+       
+    link.save_for_later = not link.save_for_later
+    link.save()
     
+    self.redirect('/' + bookmarklet)
 
 application = webapp.WSGIApplication(
                                      [('/', Root),
                                      (r'/(.*)/create', CreateLink),
+                                     (r'/(.*)/(.*)/save', SaveLink),
                                      (r'/(.*)/(.*)', RedirectToLink),
                                      (r'/(.*)', Links)],
-                                     debug=False)
+                                     debug=True)
 
 def main():
     run_wsgi_app(application)
