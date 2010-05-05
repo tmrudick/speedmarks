@@ -105,6 +105,7 @@ class CreatePhrase(webapp.RequestHandler):
     dbPhrase = db.GqlQuery("SELECT * FROM Share WHERE phrase = :1", phrase).get()
     
     while dbPhrase:
+      memcache.incr('phrase_hits', initial_value=0)
       phrase = words.generatePhrase(2)
       dbPhrase = db.GqlQuery("SELECT * FROM Share WHERE phrase = :1", phrase).get()
     
