@@ -45,7 +45,7 @@ class Links(webapp.RequestHandler):
           link.url = link.url[0:80] + '...'
       
       path = os.path.join(os.path.dirname(__file__), 'views/list.html')
-      self.response.out.write(template.render(path, {'links': links}))      
+      self.response.out.write(template.render(path, {'links': links, 'bookmarklet': bookmarklet}))      
       
 class CreateLink(webapp.RequestHandler):
     def get(self, bookmarklet):
@@ -136,10 +136,27 @@ class ShareLink(webapp.RequestHandler):
         
     self.redirect('/' + bookmarklet)
       
+class Options(webapp.RequestHandler):
+  def get(self, bookmarklet):
+    share = db.GqlQuery("SELECT * FROM Share WHERE bookmarklet = :1", bookmarklet).get()
+    
+    share_phrase = ""
+    
+    if share:
+      share_phrase = share.phrase
+
+    path = os.path.join(os.path.dirname(__file__), 'views/options.html')
+    self.response.out.write(template.render(path, {'bookmarklet': bookmarklet, 'phrase': share_phrase}))
+
+  def post(self, bookmarklet):
+    # Do I need this?
+    pass
+
 application = webapp.WSGIApplication(
                                      [('/', Root),
                                      (r'/(.*)/create', CreateLink),
                                      (r'/(.*)/phrase', CreatePhrase),
+                                     (r'/(.*)/options', Options),
                                      (r'/(.*)/(.*)/save', SaveLink),
                                      (r'/(.*)/(.*)/share/(.*)', ShareLink),
                                      (r'/(.*)/(.*)', RedirectToLink),

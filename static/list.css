@@ -61,3 +61,9 @@
     border: 0;
     margin-bottom: -2px;
   }
+  #options-link {
+    display: block;
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+  }
