@@ -4,6 +4,11 @@ from google.appengine.ext import db
 import os
 from google.appengine.ext.webapp import template
 from google.appengine.ext.db import BadKeyError
+from google.appengine.api import memcache
+
+class Share(db.Model):
+  phrase = db.StringProperty()
+  bookmarklet = db.StringProperty()
 
 class Link(db.Model):
   url = db.StringProperty()
@@ -54,7 +59,7 @@ class CreateLink(webapp.RequestHandler):
       link.bookmarklet = bookmarklet
       
       link.put()
-      
+            
       self.redirect(link.url)
       
 class RedirectToLink(webapp.RequestHandler):
@@ -70,11 +75,10 @@ class RedirectToLink(webapp.RequestHandler):
       path = os.path.join(os.path.dirname(__file__), 'views/error.html')
       self.response.out.write(template.render(path, {}))
     elif link.bookmarklet == bookmarklet:
+      # Increment how many links we have served
+      memcache.incr('links_served', initial_value=0)
       if not link.save_for_later:
         link.delete() 
-      else:
-        link.save_for_later = False
-        link.save()
         
       self.redirect(link.url)
     else:
@@ -88,8 +92,8 @@ class SaveLink(webapp.RequestHandler):
        path = os.path.join(os.path.dirname(__file__), 'views/error.html')
        self.response.out.write(template.render(path, {}))
        return
-       
-    link.save_for_later = not link.save_for_later
+    
+    link.save_for_later = not link.save_for_later   
     link.save()
     
     self.redirect('/' + bookmarklet)
@@ -100,7 +104,7 @@ application = webapp.WSGIApplication(
                                      (r'/(.*)/(.*)/save', SaveLink),
                                      (r'/(.*)/(.*)', RedirectToLink),
                                      (r'/(.*)', Links)],
-                                     debug=True)
+                                     debug=False)
 
 def main():
     run_wsgi_app(application)
