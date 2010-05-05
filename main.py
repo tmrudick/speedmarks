@@ -5,6 +5,7 @@ import os
 from google.appengine.ext.webapp import template
 from google.appengine.ext.db import BadKeyError
 from google.appengine.api import memcache
+import words
 
 class Share(db.Model):
   phrase = db.StringProperty()
@@ -35,7 +36,7 @@ class Root(webapp.RequestHandler):
 
 class Links(webapp.RequestHandler):
     def get(self, bookmarklet):
-      links = db.GqlQuery("SELECT * FROM Link WHERE bookmarklet = '" + bookmarklet + "' ORDER BY created_time DESC").fetch(100)
+      links = db.GqlQuery("SELECT * FROM Link WHERE bookmarklet = :1 ORDER BY created_time DESC", bookmarklet).fetch(100)
       
       for link in links:
         if len(link.title) > 80:
@@ -98,13 +99,52 @@ class SaveLink(webapp.RequestHandler):
     
     self.redirect('/' + bookmarklet)
 
+class CreatePhrase(webapp.RequestHandler):
+  def post(self, bookmarklet):
+    phrase = words.generatePhrase(2)
+    dbPhrase = db.GqlQuery("SELECT * FROM Share WHERE phrase = :1", phrase).get()
+    
+    while dbPhrase:
+      phrase = words.generatePhrase(2)
+      dbPhrase = db.GqlQuery("SELECT * FROM Share WHERE phrase = :1", phrase).get()
+    
+    share = db.GqlQuery("SELECT * FROM Share WHERE bookmarklet = :1", bookmarklet).get()
+    if not share:
+      share = Share()
+      share.bookmarklet = bookmarklet
+    
+    share.phrase = phrase
+    share.save()
+    
+    self.response.out.write(phrase)
+
+class ShareLink(webapp.RequestHandler):
+  def get(self, bookmarklet, link_key, share_phrase):
+    # Find the link
+    link = db.get(link_key)
+    
+    if link and link.bookmarklet == bookmarklet:
+      # Find the other bookmarklet guid
+      other_bookmarklet = db.GqlQuery("SELECT * FROM Share WHERE phrase = :1", share_phrase).get()
+      
+      if other_bookmarklet:
+        shared_link = Link()
+        shared_link.bookmarklet = other_bookmarklet.bookmarklet
+        shared_link.url = link.url
+        shared_link.title = link.title
+        shared_link.save()
+        
+    self.redirect('/' + bookmarklet)
+      
 application = webapp.WSGIApplication(
                                      [('/', Root),
                                      (r'/(.*)/create', CreateLink),
+                                     (r'/(.*)/phrase', CreatePhrase),
                                      (r'/(.*)/(.*)/save', SaveLink),
+                                     (r'/(.*)/(.*)/share/(.*)', ShareLink),
                                      (r'/(.*)/(.*)', RedirectToLink),
                                      (r'/(.*)', Links)],
-                                     debug=False)
+                                     debug=True)
 
 def main():
     run_wsgi_app(application)
