@@ -6,28 +6,7 @@ from google.appengine.ext.webapp import template
 from google.appengine.ext.db import BadKeyError
 from google.appengine.api import memcache
 import words
-
-class Share(db.Model):
-  phrase = db.StringProperty()
-  bookmarklet = db.StringProperty()
-
-class Link(db.Model):
-  url = db.StringProperty()
-  title = db.StringProperty()
-  bookmarklet = db.StringProperty()
-  created_time = db.DateTimeProperty(auto_now_add=True)
-  save_for_later = db.BooleanProperty();
-
-class DailyStatistic(db.Model):
-  current_links = db.IntegerProperty()
-  links_served = db.IntegerProperty()
-  user_count = db.IntegerProperty()
-  date = db.DateProperty(auto_now_add=True)
-
-class SiteStatistics(db.Model):
-  current_links = db.IntegerProperty()
-  links_served = db.IntegerProperty()
-  user_count = db.IntegerProperty()
+import models
 
 class Root(webapp.RequestHandler):
     def get(self):
@@ -101,12 +80,12 @@ class SaveLink(webapp.RequestHandler):
 
 class CreatePhrase(webapp.RequestHandler):
   def post(self, bookmarklet):
-    phrase = words.generatePhrase(2)
+    phrase = words.generatePhrase(3)
     dbPhrase = db.GqlQuery("SELECT * FROM Share WHERE phrase = :1", phrase).get()
     
     while dbPhrase:
       memcache.incr('phrase_hits', initial_value=0)
-      phrase = words.generatePhrase(2)
+      phrase = words.generatePhrase(3)
       dbPhrase = db.GqlQuery("SELECT * FROM Share WHERE phrase = :1", phrase).get()
     
     share = db.GqlQuery("SELECT * FROM Share WHERE bookmarklet = :1", bookmarklet).get()
