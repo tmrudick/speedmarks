@@ -6,7 +6,9 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<title>Speedmarks</title>
 	<link rel="stylesheet" type="text/css" href="/static/list.css" />
+	<link rel="stylesheet" type="text/css" href="/static/facebox/facebox.css" />
   <script type="text/javascript" src="/static/jquery.js"></script>
+  <script type="text/javascript" src="/static/facebox.js"></script>
 </head>
 <body>
   <h1><a href="http://speedmarks.appspot.com">Speedmarks</a></h1>
@@ -26,6 +28,7 @@
             {% endif %}
           </a>
         </span>
+        <a href="#"><img src="/static/gray_share.png" onmouseover="s(this)" onmouseout="s(this)" onclick="t('{{ link.key }}')" /></a>
         <a href="/{{ link.bookmarklet }}/{{ link.key }}">
         {% if link.title %}
             {{ link.title }}
@@ -51,6 +54,8 @@
     star.src = '/static/star.png';
     var gstar = new Image();
     gstar.src = '/static/gray_star.png';
+    var share = new Image();
+    share.src = '/static/share.png';
     
     var change = true
     
@@ -63,6 +68,39 @@
         item.src = star.src;
       }
     }
+    
+    function s(item) {
+      if (item.src == share.src) {
+        item.src = '/static/gray_share.png';
+      } else {
+        item.src = share.src;
+      }
+    }
+    function t(item) {
+      jQuery.facebox($('#sharing').clone().html());
+    }
+    function shareLink() {
+      alert("Share");
+      jQuery.facebox.close();
+    }
   </script>
+
+<div style="border: 1px solid #999;display:none;" id="options">
+  <h2>Fancy Pants Options</h2>
+  <form id="options-form" onsubmit="shareLink();return false;">
+    <p>Sharing Name: <input type="text" id="share-name" /></p>
+    <p class="sub-text">What's a sharing name?</p>
+  </form>
+</div>
+
+<div style="border: 1px solid #999;display:none;" id="sharing">
+  <h2>Share This Speedmark</h2>
+  <form id="share-form" onsubmit="shareLink();return false;">
+    <p>Who do you want to share with?</p>
+    <p><input type="text" id="share-with" /></p>
+    <p class="help">We're looking for a sharing name here...</p>
+    <input type="submit" value="Share">
+  </form>
+</div>
 </body>
 </html>

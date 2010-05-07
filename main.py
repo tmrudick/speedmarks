@@ -6,7 +6,7 @@ from google.appengine.ext.webapp import template
 from google.appengine.ext.db import BadKeyError
 from google.appengine.api import memcache
 import words
-import models
+from models import *
 
 class Root(webapp.RequestHandler):
     def get(self):
@@ -99,9 +99,10 @@ class CreatePhrase(webapp.RequestHandler):
     self.response.out.write(phrase)
 
 class ShareLink(webapp.RequestHandler):
-  def get(self, bookmarklet, link_key, share_phrase):
+  def post(self, bookmarklet, link_key):
     # Find the link
     link = db.get(link_key)
+    share_phrase = self.request.get("share")
     
     if link and link.bookmarklet == bookmarklet:
       # Find the other bookmarklet guid
@@ -138,7 +139,7 @@ application = webapp.WSGIApplication(
                                      (r'/(.*)/phrase', CreatePhrase),
                                      (r'/(.*)/options', Options),
                                      (r'/(.*)/(.*)/save', SaveLink),
-                                     (r'/(.*)/(.*)/share/(.*)', ShareLink),
+                                     (r'/(.*)/share/(.*)', ShareLink),
                                      (r'/(.*)/(.*)', RedirectToLink),
                                      (r'/(.*)', Links)],
                                      debug=True)
