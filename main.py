@@ -41,6 +41,20 @@ class CreateLink(webapp.RequestHandler):
       link.put()
             
       self.redirect(link.url)
+
+class DeleteLink(webapp.RequestHandler):
+  def get(self, bookmarklet, link_key):
+    try:
+      link = db.get(link_key)
+    except BadKeyError:
+      path = os.path.join(os.path.dirname(__file__), 'views/error.html')
+      self.response.out.write(template.render(path, {}))
+      return      
+      
+    if link.bookmarklet == bookmarklet:
+      link.delete()
+      
+    self.redirect('/' + bookmarklet)
       
 class RedirectToLink(webapp.RequestHandler):
   def get(self, bookmarklet, link_key):
@@ -78,26 +92,6 @@ class SaveLink(webapp.RequestHandler):
     
     self.redirect('/' + bookmarklet)
 
-class CreatePhrase(webapp.RequestHandler):
-  def post(self, bookmarklet):
-    phrase = words.generatePhrase(3)
-    dbPhrase = db.GqlQuery("SELECT * FROM Share WHERE phrase = :1", phrase).get()
-    
-    while dbPhrase:
-      memcache.incr('phrase_hits', initial_value=0)
-      phrase = words.generatePhrase(3)
-      dbPhrase = db.GqlQuery("SELECT * FROM Share WHERE phrase = :1", phrase).get()
-    
-    share = db.GqlQuery("SELECT * FROM Share WHERE bookmarklet = :1", bookmarklet).get()
-    if not share:
-      share = Share()
-      share.bookmarklet = bookmarklet
-    
-    share.phrase = phrase
-    share.save()
-    
-    self.response.out.write(phrase)
-
 class ShareLink(webapp.RequestHandler):
   def post(self, bookmarklet, link_key):
     # Find the link
@@ -126,17 +120,38 @@ class Options(webapp.RequestHandler):
     if share:
       share_phrase = share.phrase
 
-    path = os.path.join(os.path.dirname(__file__), 'views/options.html')
-    self.response.out.write(template.render(path, {'bookmarklet': bookmarklet, 'phrase': share_phrase}))
+    self.response.out.write(share_phrase)
 
   def post(self, bookmarklet):
-    # Do I need this?
-    pass
+    allow_sharing = self.request.get('allow')
+    
+    share = db.GqlQuery("SELECT * FROM Share WHERE bookmarklet = :1", bookmarklet).get()
+    
+    if allow_sharing == 'true':
+      phrase = words.generatePhrase(2)
+      dbPhrase = db.GqlQuery("SELECT * FROM Share WHERE phrase = :1", phrase).get()
+
+      while dbPhrase:
+        memcache.incr('phrase_hits', initial_value=0)
+        phrase = words.generatePhrase(2)
+        dbPhrase = db.GqlQuery("SELECT * FROM Share WHERE phrase = :1", phrase).get()
+
+      if not share:
+        share = Share()
+        share.bookmarklet = bookmarklet
+
+      share.phrase = phrase
+      share.save()
+
+      self.response.out.write(phrase)
+    else:
+      if share:
+        share.delete()
+      self.response.out.write("")
 
 application = webapp.WSGIApplication(
                                      [('/', Root),
                                      (r'/(.*)/create', CreateLink),
-                                     (r'/(.*)/phrase', CreatePhrase),
                                      (r'/(.*)/options', Options),
                                      (r'/(.*)/(.*)/save', SaveLink),
                                      (r'/(.*)/share/(.*)', ShareLink),

@@ -48,7 +48,7 @@
     {% endfor %}
   </ul>
   {% endif %}
-  <a id="options-link" href="/{{ bookmarklet }}/options">Options</a>
+  <a id="options-link" href="javascript:displayOptions()">Options</a>
   <script type="text/javascript">
     var star = new Image();
     star.src = '/static/star.png';
@@ -76,30 +76,52 @@
         item.src = share.src;
       }
     }
+    
+    var currentLink = null;
     function t(item) {
+      currentLink = item;
       jQuery.facebox($('#sharing').clone().html());
     }
-    function shareLink() {
-      alert("Share");
+    function shareLink(form) {
+      var share = form.find('#share-with').val();
+      $.post('/{{ bookmarklet }}/share/' + currentLink, {'share': share});
       jQuery.facebox.close();
+    }
+    function displayOptions() {
+      $.get('/{{ bookmarklet }}/options', function(data) {
+        if (data == "") {
+          $('#allow-sharing').attr('checked', false);
+        } else {
+          $('#allow-sharing').attr('checked', true);
+          $('#share-name').val(data);
+        }
+        $.facebox($('#options'));
+      });
+    }
+    function enableSharing() {
+      $.post('/{{ bookmarklet }}/options', {'allow': $('#allow-sharing').attr('checked')}, function(data) {
+        $('#share-name').val(data);
+      });
     }
   </script>
 
-<div style="border: 1px solid #999;display:none;" id="options">
+<div style="border: 1px solid #999;display:block;" id="options">
   <h2>Fancy Pants Options</h2>
-  <form id="options-form" onsubmit="shareLink();return false;">
-    <p>Sharing Name: <input type="text" id="share-name" /></p>
-    <p class="sub-text">What's a sharing name?</p>
+  <form onsubmit="shareLink();return false;">
+    <p>Enable sharing <input id="allow-sharing" type="checkbox" onclick="enableSharing()" />
+    <p>Your sharing name: <input type="text" id="share-name" /></p>
+    <p class="sub-text">How to share</p>
+    <a href="#" onclick="$.facebox.close();return false;">Cancel</a><input type="submit" value="Save">
   </form>
 </div>
 
 <div style="border: 1px solid #999;display:none;" id="sharing">
   <h2>Share This Speedmark</h2>
-  <form id="share-form" onsubmit="shareLink();return false;">
+  <form onsubmit="shareLink($(this));return false;">
     <p>Who do you want to share with?</p>
     <p><input type="text" id="share-with" /></p>
     <p class="help">We're looking for a sharing name here...</p>
-    <input type="submit" value="Share">
+    <a href="#" onclick="$.facebox.close();return false;">Cancel</a><input type="submit" value="Share">
   </form>
 </div>
 </body>
