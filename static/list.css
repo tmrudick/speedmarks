@@ -74,6 +74,7 @@
   width: 90%;
   height: 25px;
   line-height: 25px;
+  text-align: center;
 }
 
 #visible-sharing form p, #visible-options form p {

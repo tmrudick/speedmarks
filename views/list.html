@@ -85,7 +85,7 @@
       jQuery.facebox(sharing);
     }
     function shareLink(form) {
-      var share = form.find('#share-with').val();
+      var share = form.find('.share-with').val();
       $.post('/{{ bookmarklet }}/share/' + currentLink, {'share': share});
       jQuery.facebox.close();
     }
@@ -122,7 +122,7 @@
   <form onsubmit="shareLink();return false;">
     <p>Enable sharing <input class="allow-sharing" type="checkbox" onclick="enableSharing()" />
     <div class="share-name-options" style="display:none;">
-      <p>Your sharing name: <input type="text" class="share-name" /></p>
+      <p>Your sharing name: <input type="text" class="share-name" disabled="true" /></p>
       <p class="help">How do I share?</p>
     </div>
     <p class="buttons"><a href="#" onclick="$.facebox.close();return false;">Close</a></p>
