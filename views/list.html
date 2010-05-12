@@ -20,7 +20,7 @@
     {% for link in links %}
       <li>
         <span class="save">
-          <a href="/{{ link.bookmarklet }}/save/{{ link.key }}" onclick="$.get('/{{ link.bookmarklet }}/{{ link.key }}/save');change=false;return false;">
+          <a href="/{{ link.bookmarklet }}/save/{{ link.key }}" onclick="$.get('/{{ link.bookmarklet }}/save/{{ link.key }}');change=false;return false;">
             {% if link.save_for_later %}
               <img src="/static/star.png" onmouseover="o(this)" onmouseout="o(this)" />
             {% else %}
@@ -116,6 +116,7 @@
     }
   </script>
 
+<!-- popup windows -->
 <div style="display:none;" id="options">
   <div>
   <h2>Fancy Pants Options</h2>
@@ -129,7 +130,6 @@
   </form>
   </div>
 </div>
-
 <div style="display:none;" id="sharing">
   <div>
   <h2>Share This Speedmark</h2>
