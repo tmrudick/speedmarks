@@ -47,7 +47,7 @@
     position: absolute;
     display: block;
     top: 0px;
-    left: -145px;
+    left: -155px;
     color: #aaa;
   }
   .url {
@@ -67,3 +67,36 @@
     bottom: 10px;
     right: 10px;
   }
+  
+/* Sharing box */
+#visible-sharing .share-with {
+  border: 1px solid #666;
+  width: 90%;
+  height: 25px;
+  line-height: 25px;
+}
+
+#visible-sharing form p, #visible-options form p {
+  margin: 10px 15px;
+  color: #666;
+}
+p.help {
+  margin-left: 15px;
+  font-size: 10px;
+  color: #999;
+}
+#visible-sharing form p.buttons, #visible-options form p.buttons {
+  text-align: right;
+}  
+#visible-sharing form p.buttons a {
+  margin-right: 10px;
+}
+
+/* Options box */
+#visible-options .share-name {
+  border: 1px solid #666;
+  text-align: center;
+  height: 25px;
+  line-height: 25px;
+  margin-left: 15px;
+}

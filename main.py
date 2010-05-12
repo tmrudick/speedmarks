@@ -153,7 +153,7 @@ application = webapp.WSGIApplication(
                                      [('/', Root),
                                      (r'/(.*)/create', CreateLink),
                                      (r'/(.*)/options', Options),
-                                     (r'/(.*)/(.*)/save', SaveLink),
+                                     (r'/(.*)/save/(.*)', SaveLink),
                                      (r'/(.*)/share/(.*)', ShareLink),
                                      (r'/(.*)/(.*)', RedirectToLink),
                                      (r'/(.*)', Links)],

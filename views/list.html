@@ -20,7 +20,7 @@
     {% for link in links %}
       <li>
         <span class="save">
-          <a href="/{{ link.bookmarklet }}/{{ link.key }}/save" onclick="$.get('/{{ link.bookmarklet }}/{{ link.key }}/save');change=false;return false;">
+          <a href="/{{ link.bookmarklet }}/save/{{ link.key }}" onclick="$.get('/{{ link.bookmarklet }}/{{ link.key }}/save');change=false;return false;">
             {% if link.save_for_later %}
               <img src="/static/star.png" onmouseover="o(this)" onmouseout="o(this)" />
             {% else %}
@@ -80,7 +80,9 @@
     var currentLink = null;
     function t(item) {
       currentLink = item;
-      jQuery.facebox($('#sharing').clone().html());
+      var sharing = $('#sharing > div').clone();
+      sharing.attr('id', 'visible-sharing');
+      jQuery.facebox(sharing);
     }
     function shareLink(form) {
       var share = form.find('#share-with').val();
@@ -88,41 +90,56 @@
       jQuery.facebox.close();
     }
     function displayOptions() {
+      var options = $('#options > div').clone();
+      options.attr('id', 'visible-options');
+      $.facebox(options);
+      
       $.get('/{{ bookmarklet }}/options', function(data) {
         if (data == "") {
-          $('#allow-sharing').attr('checked', false);
+          $('#visible-options .allow-sharing').attr('checked', false);
         } else {
-          $('#allow-sharing').attr('checked', true);
-          $('#share-name').val(data);
+          $('#visible-options .allow-sharing').attr('checked', true);
+          $('#visible-options .share-name').val(data);
+          $('#visible-options .share-name-options').show();
         }
-        $.facebox($('#options'));
       });
     }
     function enableSharing() {
-      $.post('/{{ bookmarklet }}/options', {'allow': $('#allow-sharing').attr('checked')}, function(data) {
-        $('#share-name').val(data);
+      if ($('#visible-options .allow-sharing').attr('checked') == true) {
+        $('#visible-options .share-name-options').show();
+      } else {
+        $('#visible-options .share-name-options').hide();
+      }
+      $.post('/{{ bookmarklet }}/options', {'allow': $('#visible-options .allow-sharing').attr('checked')}, function(data) {
+        $('#visible-options .share-name').val(data);
       });
     }
   </script>
 
-<div style="border: 1px solid #999;display:block;" id="options">
+<div style="display:none;" id="options">
+  <div>
   <h2>Fancy Pants Options</h2>
   <form onsubmit="shareLink();return false;">
-    <p>Enable sharing <input id="allow-sharing" type="checkbox" onclick="enableSharing()" />
-    <p>Your sharing name: <input type="text" id="share-name" /></p>
-    <p class="sub-text">How to share</p>
-    <a href="#" onclick="$.facebox.close();return false;">Cancel</a><input type="submit" value="Save">
+    <p>Enable sharing <input class="allow-sharing" type="checkbox" onclick="enableSharing()" />
+    <div class="share-name-options" style="display:none;">
+      <p>Your sharing name: <input type="text" class="share-name" /></p>
+      <p class="help">How do I share?</p>
+    </div>
+    <p class="buttons"><a href="#" onclick="$.facebox.close();return false;">Close</a></p>
   </form>
+  </div>
 </div>
 
-<div style="border: 1px solid #999;display:none;" id="sharing">
+<div style="display:none;" id="sharing">
+  <div>
   <h2>Share This Speedmark</h2>
   <form onsubmit="shareLink($(this));return false;">
     <p>Who do you want to share with?</p>
-    <p><input type="text" id="share-with" /></p>
+    <p><input type="text" class="share-with" /></p>
     <p class="help">We're looking for a sharing name here...</p>
-    <a href="#" onclick="$.facebox.close();return false;">Cancel</a><input type="submit" value="Share">
+    <p class="buttons"><a href="#" onclick="$.facebox.close();return false;">Cancel</a><input type="submit" value="Share"></p>
   </form>
+  </div>
 </div>
 </body>
 </html>
