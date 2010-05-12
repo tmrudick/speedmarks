@@ -149,8 +149,14 @@ class Options(webapp.RequestHandler):
         share.delete()
       self.response.out.write("")
 
+class Help(webapp.RequestHandler):
+  def get(self):
+    path = os.path.join(os.path.dirname(__file__), 'views/help.html')
+    self.response.out.write(template.render(path, {}))
+
 application = webapp.WSGIApplication(
                                      [('/', Root),
+                                     (r'/help', Help),
                                      (r'/(.*)/create', CreateLink),
                                      (r'/(.*)/options', Options),
                                      (r'/(.*)/save/(.*)', SaveLink),
