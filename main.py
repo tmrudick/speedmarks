@@ -92,7 +92,24 @@ class SaveLink(webapp.RequestHandler):
     
     self.redirect('/' + bookmarklet)
 
-class ShareLink(webapp.RequestHandler):
+class ShareNewLink(webapp.RequestHandler):
+  def post(self, bookmarklet):
+    url = self.request.get("url")
+    title = self.request.get("title")
+    share_phrase = self.request.get("share")
+    
+    other_bookmarklet = db.GqlQuery("SELECT * FROM Share WHERE phrase = :1", share_phrase).get()
+    
+    if other_bookmarklet:
+      shared_link = Link()
+      shared_link.bookmarklet = other_bookmarklet.bookmarklet
+      shared_link.url = url
+      shared_link.title = title
+      shared_link.save()    
+    
+    self.redirect('/' + bookmarklet)
+
+class ShareExistingLink(webapp.RequestHandler):
   def post(self, bookmarklet, link_key):
     # Find the link
     link = db.get(link_key)
@@ -160,7 +177,8 @@ application = webapp.WSGIApplication(
                                      (r'/(.*)/create', CreateLink),
                                      (r'/(.*)/options', Options),
                                      (r'/(.*)/save/(.*)', SaveLink),
-                                     (r'/(.*)/share/(.*)', ShareLink),
+                                     (r'/(.*)/share', ShareNewLink),
+                                     (r'/(.*)/share/(.*)', ShareExistingLink),
                                      (r'/(.*)/(.*)', RedirectToLink),
                                      (r'/(.*)', Links)],
                                      debug=True)
