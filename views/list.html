@@ -45,6 +45,7 @@
               {{ link.url }}
           </span>
         {% endif %}
+				<a href="/{{ bookmarklet }}/delete/{{ link.key }}">Delete</a>
         {% ifchanged link.created_time.date %}
           <span class="date">{{ link.created_time.date|date:"M j, Y" }}</span>        
         {% endifchanged %}

@@ -175,6 +175,7 @@ application = webapp.WSGIApplication(
                                      [('/', Root),
                                      (r'/help', Help),
                                      (r'/(.*)/create', CreateLink),
+                                     (r'/(.*)/delete/(.*)', DeleteLink),
                                      (r'/(.*)/options', Options),
                                      (r'/(.*)/save/(.*)', SaveLink),
                                      (r'/(.*)/share', ShareNewLink),
