@@ -1,4 +1,7 @@
-var speedmarks = function(bookmarklet) {
+// When you create this object, pass in the bookmarklet
+// as a property on the first parameter.
+
+var speedmarks = function(spec) {
 
   var star = new Image();
   star.src = '/static/star.png';
@@ -8,6 +11,8 @@ var speedmarks = function(bookmarklet) {
   share.src = '/static/share.png';
   
   var change = true;
+
+  var bookmarklet = spec.bookmarklet;
   
   var that = {};
   
