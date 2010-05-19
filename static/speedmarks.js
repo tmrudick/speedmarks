@@ -90,12 +90,12 @@ var speedmarks = function(spec) {
   that.enableSharing = enableSharing;
 
   function show(id) {
-    $("#" + id).show();
+    $("#" + id)['0'].style.visibility = "visible";
   }
   that.show = show;
 
   function hide(id) {
-    $("#" + id).hide();
+    $("#" + id)['0'].style.visibility = "hidden";
   }
   that.hide = hide;
   

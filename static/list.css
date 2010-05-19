@@ -56,6 +56,9 @@
     font-size: 70%;
     color: #777;
   }
+  .delete {
+    visibility: hidden;
+  }
   a img {
     height: 16px;
     width: 16px;
