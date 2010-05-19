@@ -11,7 +11,10 @@
   <script type="text/javascript" src="/static/facebox.js"></script>
 	<script type="text/javascript" src="/static/speedmarks.js"></script>
 	<script type="text/javascript">
-		var speedmarks = speedmarks('{{ bookmarklet }}');
+		var speedmarks = speedmarks(
+		  {
+		    bookmarklet: '{{ bookmarklet }}'
+		  });
 	</script>
 </head>
 <body>
