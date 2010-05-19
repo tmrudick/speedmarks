@@ -59,6 +59,9 @@
   .delete {
     visibility: hidden;
   }
+  .save {
+    text-decoration: none;
+  }
   a img {
     height: 16px;
     width: 16px;
