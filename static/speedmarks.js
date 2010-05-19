@@ -1,5 +1,5 @@
 // When you create this object, pass in the bookmarklet
-// as a property on the first parameter.
+// as a property on the 'spec' parameter.
 
 var speedmarks = function(spec) {
 
@@ -90,12 +90,12 @@ var speedmarks = function(spec) {
   that.enableSharing = enableSharing;
 
   function show(id) {
-    $("#" + id)['0'].style.visibility = "visible";
+    $("#" + id)[0].style.visibility = "visible";
   }
   that.show = show;
 
   function hide(id) {
-    $("#" + id)['0'].style.visibility = "hidden";
+    $("#" + id)[0].style.visibility = "hidden";
   }
   that.hide = hide;
   
