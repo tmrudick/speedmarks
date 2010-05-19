@@ -38,7 +38,7 @@
   var guid = guid();
 
   var save_bookmarklet = document.getElementById('save');
-  save_bookmarklet.href="javascript:location.href='http://speedmarks.appspot.com/" + guid + "/create?url='+encodeURIComponent(location.href)+';title='+encodeURIComponent(document.title.replace(/^\s*|\s*$/g,''))";
+  save_bookmarklet.href="javascript:location.href='http://speedmarks.appspot.com/" + guid + "/create?url='+encodeURIComponent(location.href)+';title='+encodeURIComponent(document.title)";
   
   show_bookmarklet = document.getElementById('view');
   show_bookmarklet.href="http://speedmarks.appspot.com/" + guid;

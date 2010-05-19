@@ -9,6 +9,10 @@
 	<link rel="stylesheet" type="text/css" href="/static/facebox/facebox.css" />
   <script type="text/javascript" src="/static/jquery.js"></script>
   <script type="text/javascript" src="/static/facebox.js"></script>
+	<script type="text/javascript" src="/static/speedmarks.js"></script>
+	<script type="text/javascript">
+		var speedmarks = speedmarks('{{ bookmarklet }}');
+	</script>
 </head>
 <body>
   <h1><a href="http://speedmarks.appspot.com">Speedmarks</a></h1>
@@ -20,15 +24,15 @@
     {% for link in links %}
       <li>
         <span class="save">
-          <a href="/{{ link.bookmarklet }}/save/{{ link.key }}" onclick="$.get('/{{ link.bookmarklet }}/save/{{ link.key }}');change=false;return false;">
+          <a href="/{{ link.bookmarklet }}/save/{{ link.key }}" onclick="$.get('/{{ link.bookmarklet }}/save/{{ link.key }}');speedmarks.setChange(false);return false;">
             {% if link.save_for_later %}
-              <img src="/static/star.png" onmouseover="o(this)" onmouseout="o(this)" />
+              <img src="/static/star.png" onmouseover="speedmarks.starMouseOver(this)" onmouseout="speedmarks.starMouseOver(this)" />
             {% else %}
-              <img src="/static/gray_star.png" onmouseover="o(this)" onmouseout="o(this)" />
+              <img src="/static/gray_star.png" onmouseover="speedmarks.starMouseOver(this)" onmouseout="speedmarks.starMouseOver(this)" />
             {% endif %}
           </a>
         </span>
-        <a href="#"><img src="/static/gray_share.png" onmouseover="s(this)" onmouseout="s(this)" onclick="t('{{ link.key }}')" /></a>
+        <a href="#"><img src="/static/gray_share.png" onmouseover="speedmarks.shareMouseOver(this)" onmouseout="speedmarks.shareMouseOver(this)" onclick="speedmarks.displayShareBox('{{ link.key }}')" /></a>
         <a href="/{{ link.bookmarklet }}/{{ link.key }}">
         {% if link.title %}
             {{ link.title }}
@@ -48,80 +52,14 @@
     {% endfor %}
   </ul>
   {% endif %}
-  <a id="options-link" href="javascript:displayOptions()">Options</a>
-  <script type="text/javascript">
-    var star = new Image();
-    star.src = '/static/star.png';
-    var gstar = new Image();
-    gstar.src = '/static/gray_star.png';
-    var share = new Image();
-    share.src = '/static/share.png';
-    
-    var change = true
-    
-    function o(item) {
-      if (!change)
-        return change=true
-      if (item.src == star.src) {
-        item.src = gstar.src;
-      } else {
-        item.src = star.src;
-      }
-    }
-    
-    function s(item) {
-      if (item.src == share.src) {
-        item.src = '/static/gray_share.png';
-      } else {
-        item.src = share.src;
-      }
-    }
-    
-    var currentLink = null;
-    function t(item) {
-      currentLink = item;
-      var sharing = $('#sharing > div').clone();
-      sharing.attr('id', 'visible-sharing');
-      jQuery.facebox(sharing);
-    }
-    function shareLink(form) {
-      var share = form.find('.share-with').val();
-      $.post('/{{ bookmarklet }}/share/' + currentLink, {'share': share});
-      jQuery.facebox.close();
-    }
-    function displayOptions() {
-      var options = $('#options > div').clone();
-      options.attr('id', 'visible-options');
-      $.facebox(options);
-      
-      $.get('/{{ bookmarklet }}/options', function(data) {
-        if (data == "") {
-          $('#visible-options .allow-sharing').attr('checked', false);
-        } else {
-          $('#visible-options .allow-sharing').attr('checked', true);
-          $('#visible-options .share-name').val(data);
-          $('#visible-options .share-name-options').show();
-        }
-      });
-    }
-    function enableSharing() {
-      if ($('#visible-options .allow-sharing').attr('checked') == true) {
-        $('#visible-options .share-name-options').show();
-      } else {
-        $('#visible-options .share-name-options').hide();
-      }
-      $.post('/{{ bookmarklet }}/options', {'allow': $('#visible-options .allow-sharing').attr('checked')}, function(data) {
-        $('#visible-options .share-name').val(data);
-      });
-    }
-  </script>
+  <a id="options-link" href="javascript:speedmarks.displayOptions()">Options</a>
 
 <!-- popup windows -->
 <div style="display:none;" id="options">
   <div>
   <h2>Fancy Pants Options</h2>
-  <form onsubmit="shareLink();return false;">
-    <p>Enable sharing <input class="allow-sharing" type="checkbox" onclick="enableSharing()" />
+  <form onsubmit="speedmarks.shareLink();return false;">
+    <p>Enable sharing <input class="allow-sharing" type="checkbox" onclick="speedmarks.enableSharing()" />
     <div class="share-name-options" style="display:none;">
       <p>Your sharing name: <input type="text" class="share-name" disabled="true" /></p>
       <p class="help"><a href="/help">How do I share?</a></p>
@@ -133,7 +71,7 @@
 <div style="display:none;" id="sharing">
   <div>
   <h2>Share This Speedmark</h2>
-  <form onsubmit="shareLink($(this));return false;">
+  <form onsubmit="speedmarks.shareLink($(this));return false;">
     <p>Who do you want to share with?</p>
     <p><input type="text" class="share-with" /></p>
     <p class="help"><a href="/help">What's a sharing name?</a></p>
