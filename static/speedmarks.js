@@ -88,6 +88,22 @@ var speedmarks = function(spec) {
     });
   }
   that.enableSharing = enableSharing;
+
+  function showDelete(id) {
+    var idStr = "#" + id;
+    //$(idStr).style.visibility = "visible";
+    var image = document.getElementById(id);
+    image.style.visibility = "visible";
+  }
+  that.showDelete = showDelete;
+
+  function hideDelete(id) {
+    var idStr = "#" + id;
+    //$(idStr).style.visibility = "hidden";
+    var image = document.getElementById(id);
+    image.style.visibility = "hidden";
+  }
+  that.hideDelete = hideDelete;
   
   return that;
 };

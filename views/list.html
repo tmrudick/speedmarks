@@ -36,23 +36,26 @@
           </a>
         </span>
         <a href="#"><img src="/static/gray_share.png" onmouseover="speedmarks.shareMouseOver(this)" onmouseout="speedmarks.shareMouseOver(this)" onclick="speedmarks.displayShareBox('{{ link.key }}')" /></a>
-        <a href="/{{ link.bookmarklet }}/{{ link.key }}">
-        {% if link.title %}
-            {{ link.title }}
-        {% else %}
-            {{ link.url }}
-        {% endif %}
-        </a>
-        {% if link.title %}
-          <span class="url">
-              {{ link.url }}
-          </span>
-        {% endif %}
-				<a href="/{{ bookmarklet }}/delete/{{ link.key }}">Delete</a>
-        {% ifchanged link.created_time.date %}
-          <span class="date">{{ link.created_time.date|date:"M j, Y" }}</span>        
-        {% endifchanged %}
-        </li>
+	<span class="link" onmouseover="speedmarks.showDelete('{{ link.key }}');" onmouseout="speedmarks.hideDelete('{{ link.key }}');">
+	  <a href="/{{ link.bookmarklet }}/{{ link.key }}">
+	  {% if link.title %}
+	      {{ link.title }}
+	  {% else %}
+	      {{ link.url }}
+	  {% endif %}
+	  </a>
+	  <a href="/{{ bookmarklet }}/delete/{{ link.key }}"><img src="/static/delete.png" id="{{ link.key }}" style="visibility:hidden"/></a>
+
+	  {% if link.title %}
+	    <span class="url">
+		{{ link.url }}
+	    </span>
+	  {% endif %}
+	  {% ifchanged link.created_time.date %}
+	    <span class="date">{{ link.created_time.date|date:"M j, Y" }}</span>        
+	  {% endifchanged %}
+	  </span>
+	</li>
     {% endfor %}
   </ul>
   {% endif %}
