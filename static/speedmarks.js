@@ -89,21 +89,15 @@ var speedmarks = function(spec) {
   }
   that.enableSharing = enableSharing;
 
-  function showDelete(id) {
-    var idStr = "#" + id;
-    //$(idStr).style.visibility = "visible";
-    var image = document.getElementById(id);
-    image.style.visibility = "visible";
+  function show(id) {
+    $("#" + id).show();
   }
-  that.showDelete = showDelete;
+  that.show = show;
 
-  function hideDelete(id) {
-    var idStr = "#" + id;
-    //$(idStr).style.visibility = "hidden";
-    var image = document.getElementById(id);
-    image.style.visibility = "hidden";
+  function hide(id) {
+    $("#" + id).hide();
   }
-  that.hideDelete = hideDelete;
+  that.hide = hide;
   
   return that;
 };

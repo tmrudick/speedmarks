@@ -26,7 +26,7 @@
 	<ul>
 		{% for link in links %}
 		<li>
-			<span class="link" onmouseover="speedmarks.showDelete('{{ link.key }}');" onmouseout="speedmarks.hideDelete('{{ link.key }}');">
+			<span class="link" onmouseover="speedmarks.show('{{ link.key }}');" onmouseout="speedmarks.hide('{{ link.key }}');">
 				<span class="save">
 					<a href="/{{ link.bookmarklet }}/save/{{ link.key }}" onclick="$.get('/{{ link.bookmarklet }}/save/{{ link.key }}');speedmarks.setChange(false);return false;">
 						{% if link.save_for_later %}
@@ -44,7 +44,7 @@
 						{{ link.url }}
 					{% endif %}
 				</a>
-				<a href="/{{ bookmarklet }}/delete/{{ link.key }}"><img src="/static/delete.png" id="{{ link.key }}" style="visibility:hidden"/></a>
+				<a href="/{{ bookmarklet }}/delete/{{ link.key }}"><img src="/static/delete.png" id="{{ link.key }}" style="display:none"/></a>
 			</span>
 			{% if link.title %}
 				<span class="url">
