@@ -1,4 +1,4 @@
-var sm = function(bookmarklet) {
+var speedmarks = function(bookmarklet) {
 
   var star = new Image();
   star.src = '/static/star.png';
@@ -10,6 +10,11 @@ var sm = function(bookmarklet) {
   var change = true;
   
   var that = {};
+  
+  function setChange(newChange) {
+    change = newChange;
+  }
+  that.setChange = setChange;
   
   function starMouseOver(item) {
     if (!change) {
