@@ -18,47 +18,46 @@
 	</script>
 </head>
 <body>
-  <h1><a href="http://speedmarks.appspot.com">Speedmarks</a></h1>
-  {% if not links %}
-    <p id="empty">Nothing here...</p>
-    <p id="instructions">Add some speedmarks and then check back.</p>
-  {% else %}
-  <ul>
-    {% for link in links %}
-      <li>
-        <span class="save">
-          <a href="/{{ link.bookmarklet }}/save/{{ link.key }}" onclick="$.get('/{{ link.bookmarklet }}/save/{{ link.key }}');speedmarks.setChange(false);return false;">
-            {% if link.save_for_later %}
-              <img src="/static/star.png" onmouseover="speedmarks.starMouseOver(this)" onmouseout="speedmarks.starMouseOver(this)" />
-            {% else %}
-              <img src="/static/gray_star.png" onmouseover="speedmarks.starMouseOver(this)" onmouseout="speedmarks.starMouseOver(this)" />
-            {% endif %}
-          </a>
-        </span>
-        <a href="#"><img src="/static/gray_share.png" onmouseover="speedmarks.shareMouseOver(this)" onmouseout="speedmarks.shareMouseOver(this)" onclick="speedmarks.displayShareBox('{{ link.key }}')" /></a>
-	<span class="link" onmouseover="speedmarks.showDelete('{{ link.key }}');" onmouseout="speedmarks.hideDelete('{{ link.key }}');">
-	  <a href="/{{ link.bookmarklet }}/{{ link.key }}">
-	  {% if link.title %}
-	      {{ link.title }}
-	  {% else %}
-	      {{ link.url }}
-	  {% endif %}
-	  </a>
-	  <a href="/{{ bookmarklet }}/delete/{{ link.key }}"><img src="/static/delete.png" id="{{ link.key }}" style="visibility:hidden"/></a>
-
-	  {% if link.title %}
-	    <span class="url">
-		{{ link.url }}
-	    </span>
-	  {% endif %}
-	  {% ifchanged link.created_time.date %}
-	    <span class="date">{{ link.created_time.date|date:"M j, Y" }}</span>        
-	  {% endifchanged %}
-	  </span>
-	</li>
-    {% endfor %}
-  </ul>
-  {% endif %}
+	<h1><a href="http://speedmarks.appspot.com">Speedmarks</a></h1>
+	{% if not links %}
+		<p id="empty">Nothing here...</p>
+		<p id="instructions">Add some speedmarks and then check back.</p>
+	{% else %}
+	<ul>
+		{% for link in links %}
+		<li>
+			<span class="link" onmouseover="speedmarks.showDelete('{{ link.key }}');" onmouseout="speedmarks.hideDelete('{{ link.key }}');">
+				<span class="save">
+					<a href="/{{ link.bookmarklet }}/save/{{ link.key }}" onclick="$.get('/{{ link.bookmarklet }}/save/{{ link.key }}');speedmarks.setChange(false);return false;">
+						{% if link.save_for_later %}
+							<img src="/static/star.png" onmouseover="speedmarks.starMouseOver(this)" onmouseout="speedmarks.starMouseOver(this)" />
+						{% else %}
+							<img src="/static/gray_star.png"	onmouseover="speedmarks.starMouseOver(this)" onmouseout="speedmarks.starMouseOver(this)" />
+						{% endif %}
+					</a>
+				</span>
+				<a href="#"><img src="/static/gray_share.png" onmouseover="speedmarks.shareMouseOver(this)" onmouseout="speedmarks.shareMouseOver(this)" onclick="speedmarks.displayShareBox('{{ link.key }}')" /></a>
+				<a href="/{{ link.bookmarklet }}/{{ link.key }}">
+					{% if link.title %}
+						{{ link.title }}
+					{% else %}
+						{{ link.url }}
+					{% endif %}
+				</a>
+				<a href="/{{ bookmarklet }}/delete/{{ link.key }}"><img src="/static/delete.png" id="{{ link.key }}" style="visibility:hidden"/></a>
+			</span>
+			{% if link.title %}
+				<span class="url">
+					{{ link.url }}
+				</span>
+			{% endif %}
+			{% ifchanged link.created_time.date %}
+				<span class="date">{{ link.created_time.date|date:"M j, Y" }}</span>        
+			{% endifchanged %}
+		</li>
+		{% endfor %}
+	</ul>
+	{% endif %}
   <a id="options-link" href="javascript:speedmarks.displayOptions()">Options</a>
 
 <!-- popup windows -->
