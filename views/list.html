@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
    "http://www.w3.org/TR/html4/strict.dtd">
-
+{% set current_date = None %}
 <html lang="en">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -26,9 +26,9 @@
   <ul>
     {% for link in links %}
     <li>
-      <span onmouseover="speedmarks.show('{{ link.key }}');" onmouseout="speedmarks.hide('{{ link.key }}');">
+      <span onmouseover="speedmarks.show('{{ link.key() }}');" onmouseout="speedmarks.hide('{{ link.key() }}');">
         <span class="save">
-          <a href="/{{ link.bookmarklet }}/save/{{ link.key }}" onclick="$.get('/{{ link.bookmarklet }}/save/{{ link.key }}');speedmarks.setChange(false);return false;">
+          <a href="/{{ link.bookmarklet }}/save/{{ link.key() }}" onclick="$.get('/{{ link.bookmarklet }}/save/{{ link.key() }}');speedmarks.setChange(false);return false;">
             {% if link.save_for_later %}
               <img src="/static/star.png" onmouseover="speedmarks.starMouseOver(this)" onmouseout="speedmarks.starMouseOver(this)" />
             {% else %}
@@ -36,24 +36,25 @@
             {% endif %}
           </a>
         </span>
-        <a href="#"><img src="/static/gray_share.png" onmouseover="speedmarks.shareMouseOver(this)" onmouseout="speedmarks.shareMouseOver(this)" onclick="speedmarks.displayShareBox('{{ link.key }}')" /></a>
-        <a href="/{{ link.bookmarklet }}/{{ link.key }}">
+        <a href="#"><img src="/static/gray_share.png" onmouseover="speedmarks.shareMouseOver(this)" onmouseout="speedmarks.shareMouseOver(this)" onclick="speedmarks.displayShareBox('{{ link.key() }}')" /></a>
+        <a href="/{{ link.bookmarklet }}/{{ link.key() }}">
           {% if link.title %}
             {{ link.title }}
           {% else %}
             {{ link.url }}
           {% endif %}
         </a>
-        <a href="/{{ bookmarklet }}/delete/{{ link.key }}"><img src="/static/delete.png" id="{{ link.key }}" class="delete"/></a>
+        <a href="/{{ bookmarklet }}/delete/{{ link.key() }}"><img src="/static/delete.png" id="{{ link.key() }}" class="delete"/></a>
       </span>
       {% if link.title %}
         <span class="url">
           {{ link.url }}
         </span>
       {% endif %}
-      {% ifchanged link.created_time.date %}
-        <span class="date">{{ link.created_time.date|date:"M j, Y" }}</span>        
-      {% endifchanged %}
+      {% if not current_date or current_date != link.created_time.strftime('%b %d %Y') %}
+        {% set current_date = link.created_time.strftime('%b %d %Y') %}
+        <span class="date">{{ current_date }}</span>
+      {% endif %}
     </li>
     {% endfor %}
   </ul>
