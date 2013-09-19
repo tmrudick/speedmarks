@@ -1,155 +1,156 @@
-from google.appengine.ext import webapp
-from google.appengine.ext.webapp.util import run_wsgi_app
-from google.appengine.ext import db
 import os
-from google.appengine.ext.webapp import template
-from google.appengine.ext.db import BadKeyError
-from google.appengine.api import memcache
+import webapp2
 import words
+
+# Database
 from models import *
+from google.appengine.ext import db
+from google.appengine.ext.db import BadKeyError
 
-class Root(webapp.RequestHandler):
+# Templating
+import jinja2
+
+JINJA_ENVIRONMENT = jinja2.Environment(
+  loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
+  extensions=['jinja2.ext.autoescape'])
+
+class Root(webapp2.RequestHandler):
     def get(self):
-        path = os.path.join(os.path.dirname(__file__), 'views/index.html')
-        self.response.out.write(template.render(path, {}))
+        template = JINJA_ENVIRONMENT.get_template('views/index.html')
+        self.response.write(template.render({}))
 
-class Links(webapp.RequestHandler):
+class Links(webapp2.RequestHandler):
     def get(self, bookmarklet):
       links = db.GqlQuery("SELECT * FROM Link WHERE bookmarklet = :1 ORDER BY created_time DESC", bookmarklet).fetch(100)
-      
+
       for link in links:
         if len(link.title) > 80:
           link.title = link.title[0:80] + '...'
         if len(link.url) > 80:
           link.url = link.url[0:80] + '...'
-      
-      path = os.path.join(os.path.dirname(__file__), 'views/list.html')
-      self.response.out.write(template.render(path, {'links': links, 'bookmarklet': bookmarklet}))      
-      
-class CreateLink(webapp.RequestHandler):
+
+      template = JINJA_ENVIRONMENT.get_template('views/list.html')
+      self.response.write(template.render({'links': links, 'bookmarklet': bookmarklet}))
+
+class CreateLink(webapp2.RequestHandler):
     def get(self, bookmarklet):
       if self.request.get('url') == "":
-        path = os.path.join(os.path.dirname(__file__), 'views/error.html')
-        self.response.out.write(template.render(path, {}))
+        template = JINJA_ENVIRONMENT.get_template('views/error.html')
+        self.response.write(template.render({}))
         return
-      
+
       link = Link()
       link.url = self.request.get('url')
       link.title = self.request.get('title')
       link.bookmarklet = bookmarklet
-      
-      link.put()
-            
-      self.redirect(link.url)
 
-class DeleteLink(webapp.RequestHandler):
+      link.put()
+
+      self.redirect(str(link.url))
+
+class DeleteLink(webapp2.RequestHandler):
   def get(self, bookmarklet, link_key):
     try:
       link = db.get(link_key)
     except BadKeyError:
-      path = os.path.join(os.path.dirname(__file__), 'views/error.html')
-      self.response.out.write(template.render(path, {}))
-      return      
-      
+      template = JINJA_ENVIRONMENT.get_template('views/error.html')
+      self.response.write(template.render({}))
+      return
+
     if link.bookmarklet == bookmarklet:
       link.delete()
-      
-    self.redirect('/' + bookmarklet)
-      
-class RedirectToLink(webapp.RequestHandler):
+
+    self.redirect(str('/%s' % bookmarklet))
+
+class RedirectToLink(webapp2.RequestHandler):
   def get(self, bookmarklet, link_key):
     try:
       link = db.get(link_key)
     except BadKeyError:
-      path = os.path.join(os.path.dirname(__file__), 'views/error.html')
-      self.response.out.write(template.render(path, {}))
+      template = JINJA_ENVIRONMENT.get_template('views/error.html')
+      self.response.write(template.render({}))
       return
-      
-    if link == None:
-      path = os.path.join(os.path.dirname(__file__), 'views/error.html')
-      self.response.out.write(template.render(path, {}))
-    elif link.bookmarklet == bookmarklet:
-      # Increment how many links we have served
-      memcache.incr('links_served', initial_value=0)
-      if not link.save_for_later:
-        link.delete() 
-        
-      self.redirect(link.url)
-    else:
-      self.redirect('/')
 
-class SaveLink(webapp.RequestHandler):
+    if link == None:
+      template = JINJA_ENVIRONMENT.get_template('views/error.html')
+      self.response.write(template.render({}))
+    else:
+      if not link.save_for_later:
+        link.delete()
+
+      self.redirect(str(link.url))
+
+class SaveLink(webapp2.RequestHandler):
   def get(self, bookmarklet, link_key):
     try:
       link = db.get(link_key)
     except BadKeyError:
-       path = os.path.join(os.path.dirname(__file__), 'views/error.html')
-       self.response.out.write(template.render(path, {}))
-       return
-    
-    link.save_for_later = not link.save_for_later   
-    link.save()
-    
-    self.redirect('/' + bookmarklet)
+      template = JINJA_ENVIRONMENT.get_template('views/error.html')
+      self.response.write(template.render({}))
+      return
 
-class ShareNewLink(webapp.RequestHandler):
+    link.save_for_later = not link.save_for_later
+    link.save()
+
+    self.redirect(str('/%s' % bookmarklet))
+
+class ShareNewLink(webapp2.RequestHandler):
   def post(self, bookmarklet):
     url = self.request.get("url")
     title = self.request.get("title")
     share_phrase = self.request.get("share")
-    
+
     other_bookmarklet = db.GqlQuery("SELECT * FROM Share WHERE phrase = :1", share_phrase).get()
-    
+
     if other_bookmarklet:
       shared_link = Link()
       shared_link.bookmarklet = other_bookmarklet.bookmarklet
       shared_link.url = url
       shared_link.title = title
-      shared_link.save()    
-    
-    self.redirect('/' + bookmarklet)
+      shared_link.save()
 
-class ShareExistingLink(webapp.RequestHandler):
+    self.redirect(str('/%s' % bookmarklet))
+
+class ShareExistingLink(webapp2.RequestHandler):
   def post(self, bookmarklet, link_key):
     # Find the link
     link = db.get(link_key)
     share_phrase = self.request.get("share")
-    
+
     if link and link.bookmarklet == bookmarklet:
       # Find the other bookmarklet guid
       other_bookmarklet = db.GqlQuery("SELECT * FROM Share WHERE phrase = :1", share_phrase).get()
-      
+
       if other_bookmarklet:
         shared_link = Link()
         shared_link.bookmarklet = other_bookmarklet.bookmarklet
         shared_link.url = link.url
         shared_link.title = link.title
         shared_link.save()
-        
-    self.redirect('/' + bookmarklet)
-      
-class Options(webapp.RequestHandler):
+
+    self.redirect(str('/%s' % bookmarklet))
+
+class Options(webapp2.RequestHandler):
   def get(self, bookmarklet):
     share = db.GqlQuery("SELECT * FROM Share WHERE bookmarklet = :1", bookmarklet).get()
-    
+
     share_phrase = ""
-    
+
     if share:
       share_phrase = share.phrase
 
-    self.response.out.write(share_phrase)
+    self.response.write(share_phrase)
 
   def post(self, bookmarklet):
     allow_sharing = self.request.get('allow')
-    
+
     share = db.GqlQuery("SELECT * FROM Share WHERE bookmarklet = :1", bookmarklet).get()
-    
+
     if allow_sharing == 'true':
       phrase = words.generatePhrase(2)
       dbPhrase = db.GqlQuery("SELECT * FROM Share WHERE phrase = :1", phrase).get()
 
       while dbPhrase:
-        memcache.incr('phrase_hits', initial_value=0)
         phrase = words.generatePhrase(2)
         dbPhrase = db.GqlQuery("SELECT * FROM Share WHERE phrase = :1", phrase).get()
 
@@ -160,18 +161,18 @@ class Options(webapp.RequestHandler):
       share.phrase = phrase
       share.save()
 
-      self.response.out.write(phrase)
+      self.response.write(phrase)
     else:
       if share:
         share.delete()
-      self.response.out.write("")
+      self.response.write("")
 
-class Help(webapp.RequestHandler):
+class Help(webapp2.RequestHandler):
   def get(self):
-    path = os.path.join(os.path.dirname(__file__), 'views/help.html')
-    self.response.out.write(template.render(path, {}))
+    template = JINJA_ENVIRONMENT.get_template('views/help.html')
+    self.response.write(template.render({}))
 
-application = webapp.WSGIApplication(
+app = webapp2.WSGIApplication(
                                      [('/', Root),
                                      (r'/help', Help),
                                      (r'/(.*)/create', CreateLink),
@@ -183,9 +184,3 @@ application = webapp.WSGIApplication(
                                      (r'/(.*)/(.*)', RedirectToLink),
                                      (r'/(.*)', Links)],
                                      debug=True)
-
-def main():
-    run_wsgi_app(application)
-
-if __name__ == "__main__":
-    main()

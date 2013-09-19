@@ -1,7 +1,8 @@
-application: speedmarks
-version: 4
-runtime: python
+application: speedmarks-hrd
+version: 5
+runtime: python27
 api_version: 1
+threadsafe: true
 
 handlers:
 - url: /robots.txt
@@ -12,4 +13,10 @@ handlers:
   static_dir: static
 
 - url: .*
-  script: main.py
+  script: main.app
+
+libraries:
+- name: webapp2
+  version: latest
+- name: jinja2
+  version: latest
