@@ -74,11 +74,24 @@ class RedirectToLink(webapp2.RequestHandler):
     if link == None:
       template = JINJA_ENVIRONMENT.get_template('views/error.html')
       self.response.write(template.render({}))
-    else:
+    elif link.bookmarklet == bookmarklet:
       if not link.save_for_later:
         link.delete()
 
-      self.redirect(str(link.url))
+      # Redirect to /redirect to anonymously redirect
+      self.redirect('/redirect?url=%s' % str(link.url))
+    else:
+      self.redirect('/')
+
+class AnonymousRedirect(webapp2.RequestHandler):
+  def get(self):
+    url = self.request.get('url')
+
+    if not url:
+      self.redirect('/')
+    else:
+      template = JINJA_ENVIRONMENT.get_template('views/redirect.html')
+      self.response.write(template.render({'url': url}))
 
 class SaveLink(webapp2.RequestHandler):
   def get(self, bookmarklet, link_key):
@@ -181,6 +194,7 @@ app = webapp2.WSGIApplication(
                                      (r'/(.*)/save/(.*)', SaveLink),
                                      (r'/(.*)/share', ShareNewLink),
                                      (r'/(.*)/share/(.*)', ShareExistingLink),
+                                     (r'/redirect', AnonymousRedirect),
                                      (r'/(.*)/(.*)', RedirectToLink),
                                      (r'/(.*)', Links)],
                                      debug=True)
